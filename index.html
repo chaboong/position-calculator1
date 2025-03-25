@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포지션 계산기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .input-container {
+            margin: 10px 0;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>롱/숏 포지션 계산기</h1>
+    <div class="input-container">
+        <label for="loss">감당 가능한 손실:</label>
+        <input type="number" id="loss" placeholder="예: 100">
+    </div>
+    <div class="input-container">
+        <label for="entryPrice">진입가:</label>
+        <input type="number" id="entryPrice" placeholder="예: 100">
+    </div>
+    <div class="input-container">
+        <label for="stopLoss">손절가:</label>
+        <input type="number" id="stopLoss" placeholder="예: 90">
+    </div>
+    <div class="input-container">
+        <label for="leverage">레버리지:</label>
+        <input type="number" id="leverage" placeholder="예: 10">
+    </div>
+    <div class="input-container">
+        <label for="targetPrice">목표 익절가:</label>
+        <input type="number" id="targetPrice" placeholder="예: 110">
+    </div>
+    <div class="input-container">
+        <label>포지션 타입:</label><br>
+        <input type="radio" name="positionType" value="long" checked> 롱 포지션
+        <input type="radio" name="positionType" value="short"> 숏 포지션
+    </div>
+    <button onclick="calculate()">계산하기</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        function calculate() {
+            const loss = parseFloat(document.getElementById('loss').value);
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+            const leverage = parseFloat(document.getElementById('leverage').value);
+            const targetPrice = parseFloat(document.getElementById('targetPrice').value);
+            const positionType = document.querySelector('input[name="positionType"]:checked').value;
+
+            const positionSize = loss / Math.abs(entryPrice - stopLoss);
+            const buyAmount = positionSize * entryPrice;
+            const actualInvestment = buyAmount / leverage;
+            const lossPercentage = (loss / actualInvestment) * 100;
+            let profitAmount;
+
+            if (positionType === 'long') {
+                profitAmount = (targetPrice - entryPrice) * positionSize;
+            } else {
+                profitAmount = (entryPrice - targetPrice) * positionSize;
+            }
+
+            document.getElementById('result').innerHTML = `
+                <h2>결과</h2>
+                <p>포지션 규모: ${positionSize.toFixed(2)}</p>
+                <p>매수 금액: ${buyAmount.toFixed(2)}</p>
+                <p>실제 투자 금액: ${actualInvestment.toFixed(2)}</p>
+                <p>손실 퍼센트: ${lossPercentage.toFixed(2)}%</p>
+                <p>수익 금액: ${profitAmount.toFixed(2)}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
